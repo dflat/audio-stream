@@ -1,0 +1,3 @@
+HOST = 'localhost'
+PORT = 5000
+CHUNK_SIZE = 8192
