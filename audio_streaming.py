@@ -3,9 +3,8 @@ import wave
 import time
 import socket
 import threading
-from config import PORT
+from config import PORT, AUDIO_SAMPLE_RATE, CHANNELS, AUDIO_CHUNK_SIZE
 from pydub import AudioSegment
-from pynput import keyboard
 from key_input import KeyboardListener
 
 class BaseAudioRecorder:
@@ -16,7 +15,7 @@ class BaseAudioRecorder:
     The main engine of recording is done in _record().
     The public api to use the class consists of the record() and stop() methods.
     """
-    def __init__(self, rate=44100, channels=2, chunk=4096):
+    def __init__(self, rate=AUDIO_SAMPLE_RATE, channels=CHANNELS, chunk=AUDIO_CHUNK_SIZE):
         self.rate = rate
         self.channels = channels
         self.chunk = chunk
@@ -122,7 +121,11 @@ class LocalAudioRecorder(BaseAudioRecorder):
     """
     Record audio from microphone and save to disk as wav/mp3.
     """
-    def __init__(self, filename="test", rate=44100, channels=2, chunk=4096):
+    def __init__(self, filename="test",
+                        rate=AUDIO_SAMPLE_RATE,
+                        channels=CHANNELS,
+                        chunk=AUDIO_CHUNK_SIZE):
+
         super().__init__(rate, channels, chunk)
         self.basename = self.get_basename(filename)
         self.wav_path = self.basename + '.wav'
@@ -163,8 +166,15 @@ class LocalAudioRecorder(BaseAudioRecorder):
         print(f"Recording saved as: {self.wav_path}, {self.mp3_path}")
 
 class StreamingAudioRecorder(BaseAudioRecorder):
-    def __init__(self, rate=44100, channels=2, chunk=4096,
-                 server_ip='127.0.0.1', server_port=5000):
+    """
+    Record audio from microphone and stream over network socket.
+    """
+    def __init__(self, rate=AUDIO_SAMPLE_RATE,
+                        channels=CHANNELS,
+                        chunk=AUDIO_CHUNK_SIZE,
+                        server_ip='127.0.0.1',
+                        server_port=PORT):
+
         super().__init__(rate, channels, chunk)
         self.server_ip = server_ip
         self.server_port = server_port
@@ -202,8 +212,17 @@ class StreamingAudioRecorder(BaseAudioRecorder):
 
 
 class KeyedStreamingAudioRecorder(StreamingAudioRecorder):
-    def __init__(self, key, rate=44100, channels=2, chunk=4096,
-                 server_ip='127.0.0.1', server_port=PORT):
+    """
+    StreamingAudioRecorder, but microphone recording is
+      triggered with keypress event.
+    """
+    def __init__(self, key,
+                        rate=AUDIO_SAMPLE_RATE,
+                        channels=CHANNELS,
+                        chunk=AUDIO_CHUNK_SIZE,
+                        server_ip='127.0.0.1',
+                        server_port=PORT):
+
         super().__init__(rate, channels, chunk, server_ip, server_port)
         self.key = key
         self.keyboard = KeyboardListener(key=self.key,
@@ -211,7 +230,7 @@ class KeyedStreamingAudioRecorder(StreamingAudioRecorder):
                                          end_callback=self.stop,
                                          one_shot=False)
 
-    def standby(self):
+    def standby(self, one_shot=False):
         """
         If one_shot is set to True, Call every time you want to wait 
             for a keypress. Upon key up event of self.key, keyboard listener
@@ -220,6 +239,7 @@ class KeyedStreamingAudioRecorder(StreamingAudioRecorder):
             without the need to re-invoke standby().
         """
         print(f"Press and hold the '{self.key}' key to start streaming audio...")
+        self.keyboard.one_shot = one_shot
         self.keyboard.listen()
 
     def stop_listening(self):
