@@ -1,10 +1,10 @@
 import atexit
-from IPython import get_ipython
 
 def register(cleanup_func):
     # Register with atexit
     atexit.register(cleanup_func)
 
+def register_ipython(cleanup_func): # not working
     # Register with IPython if available
     ip = get_ipython()
     if ip is not None:
