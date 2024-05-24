@@ -70,9 +70,9 @@ class KeyboardListener:
         if length > 0 and chars == self.key:
             # Suppress self.key from printing to terminal
             return None
-        elif length > 0 and chars == 'a':
+        #elif length > 0 and chars == 'a':
             # Transform a to b
-            Quartz.CGEventKeyboardSetUnicodeString(event, 1, 'b')
+        #    Quartz.CGEventKeyboardSetUnicodeString(event, 1, 'b')
         else:
             return event
 
