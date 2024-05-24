@@ -1,11 +1,14 @@
 import socket
 import threading
 from config import PORT, CHUNK_SIZE
+import teardown
 
 class Server:
     def __init__(self, host='', # Empty string to listen on all network interfaces.
                        port=PORT,
                        chunk_size=CHUNK_SIZE):
+
+        teardown.register(self.teardown)
         self.host = host
         self.port = port
         self.chunk_size = chunk_size
@@ -23,6 +26,11 @@ class Server:
         print(f"Server is listening on {self.host}:{self.port}")
         self._running.set()
         threading.Thread(target=self._serve).start()
+
+    def teardown(self):
+        if self.running:
+            print('Dirty exit: fallback teardown started...')
+            self.shutdown()
 
     def shutdown(self):
         self._running.clear()
@@ -83,6 +91,10 @@ class Server:
 class SpeechToTextServer(Server):
     def __init__(self, host='', port=PORT, chunk_size=CHUNK_SIZE):
         super().__init__(host, port, chunk_size)
+
+    def sequential_send(self, sequence):
+        for token in sequence:
+            pass
 
     def speech_to_text(self, buffer):
         print('converting speech to text...')
