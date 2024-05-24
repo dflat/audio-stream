@@ -12,10 +12,11 @@ class KeyboardListener:
         self.keyboard.listening to query if active,
     and self.keyboard.stop_listening() to clean-up underlying listener.
     """
-    def __init__(self, key, start_callback, end_callback):
+    def __init__(self, key, start_callback, end_callback, one_shot=False):
         self.key = key
         self.start_callback = start_callback
         self.end_callback = end_callback
+        self.one_shot = one_shot # Listen for one keypress and then stop listening (if True)
         self.key_active = False
         self.poll_delay = 0.01
         self._init_platform_specific_kb_options()
@@ -41,7 +42,8 @@ class KeyboardListener:
                 print('key up:', key)
                 self.key_active = False
                 self.end_callback()
-                return False  # Stop listener (TODO: remove this and manually call stop_listening?)
+                if self.one_shot:
+                    return False  # Stop listener 
 
     def listen(self):
         self.listener = keyboard.Listener(on_press=self.on_press,
@@ -50,7 +52,8 @@ class KeyboardListener:
         self.listener.start()
 
     def stop_listening(self):
-        self.listener.stop()
+        if self.listening:
+            self.listener.stop()
 
     @property
     def listening(self):
