@@ -208,11 +208,22 @@ class KeyedStreamingAudioRecorder(StreamingAudioRecorder):
         self.key = key
         self.keyboard = KeyboardListener(key=self.key,
                                          start_callback=self.record,
-                                         end_callback=self.stop)
+                                         end_callback=self.stop,
+                                         one_shot=False)
 
     def standby(self):
+        """
+        If one_shot is set to True, Call every time you want to wait 
+            for a keypress. Upon key up event of self.key, keyboard listener
+            is shutdown until standby() is called again.
+        If one_shot is set to False, contniually listen for keypress,
+            without the need to re-invoke standby().
+        """
         print(f"Press and hold the '{self.key}' key to start streaming audio...")
         self.keyboard.listen()
+
+    def stop_listening(self):
+        self.keyboard.stop_listening()
 
 if __name__ == "__main__":
     # Example usage for recording and saving to MP3
@@ -220,5 +231,5 @@ if __name__ == "__main__":
     #local_recorder.record_and_save("test_audio", duration=5)
 
     # Example usage for streaming audio
-    streaming_recorder = KeyedStreamingAudioRecorder(key='j')
+    streaming_recorder = KeyedStreamingAudioRecorder(key='r')
     #streaming_recorder.standby()
