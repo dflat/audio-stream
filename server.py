@@ -38,27 +38,27 @@ class Server:
         while self.running:
             client_socket, client_address = self.server_socket.accept()
             print(f"Connection established with {client_address}")
-            client_thread = threading.Thread(target=self.handle_client, args=(client_socket,))
+            client_thread = threading.Thread(target=self._handle_client, args=(client_socket,))
             client_thread.start()
         print('Server has been shut down.')
 
-    def handle_client(self, client_socket):
+    def _handle_client(self, client_socket):
         try:
-            message = self.receive(client_socket)
+            message = self._receive(client_socket)
             if message:
                 print(f"Received message of length: {len(message)} bytes")
                 if message == self.sentinel_message:
                     print('Server got sentinel shutdown signal.')
                     return client_socket.close()
-                response = self.process_message(message)
+                response = self._process_message(message)
                 if response:
-                    self.send(client_socket, response)
+                    self._send(client_socket, response)
         except Exception as e:
             print(f"Error handling client: {e}")
         finally:
             client_socket.close()
 
-    def receive(self, client_socket):
+    def _receive(self, client_socket):
         chunks = []
         while True:
             chunk = client_socket.recv(self.chunk_size)
@@ -67,14 +67,14 @@ class Server:
             chunks.append(chunk)
         return b''.join(chunks)
 
-    def send(self, client_socket, response):
+    def _send(self, client_socket, response):
         """
         Override to do something different (e.g. save response 
-        in process_message and have send be a no-op).
+        in _process_message and have _send be a no-op).
         """
         client_socket.sendall(response)
 
-    def process_message(self, message):
+    def _process_message(self, message):
         """
         Override in subclass to do something besides echo message back to client.
         """
@@ -91,7 +91,7 @@ class SpeechToTextServer(Server):
         # trancript = whisper(...)
         # return transcript
 
-    def process_message(self, message):
+    def _process_message(self, message):
         """
         Message will be a bytestring (buffer) streamed by client
         (perhaps via live microphone recording).
