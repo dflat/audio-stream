@@ -52,6 +52,7 @@ class BaseAudioRecorder:
         """
         Initializes microphone input capture for recording.
         """
+        self.audio = pyaudio.PyAudio()
         self.stream = self.audio.open(format=self.format,
                                       channels=self.channels,
                                       rate=self.rate,
@@ -208,9 +209,9 @@ class KeyedStreamingAudioRecorder(StreamingAudioRecorder):
         self.keyboard = KeyboardListener(key=self.key,
                                          start_callback=self.record,
                                          end_callback=self.stop)
-        print(f"Press and hold the '{self.key}' key to start streaming audio...")
 
     def standby(self):
+        print(f"Press and hold the '{self.key}' key to start streaming audio...")
         self.keyboard.listen()
 
 if __name__ == "__main__":
