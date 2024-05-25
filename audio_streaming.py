@@ -252,4 +252,4 @@ if __name__ == "__main__":
 
     # Example usage for streaming audio
     streaming_recorder = KeyedStreamingAudioRecorder(key='r')
-    #streaming_recorder.standby()
+    streaming_recorder.standby(one_shot=True)
