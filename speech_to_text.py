@@ -1,5 +1,7 @@
 from server import Server
+print('importing numpy...', end=' ')
 import numpy as np
+print('loaded.')
 from config import PORT, CHUNK_SIZE, WHISPER_MODEL
 import queue
 
@@ -9,15 +11,19 @@ class Whisper:
         self._init_model(model_name)
 
     def _init_model(self, model_name):
+        print('importing whisper...', end=' ')
         import whisper
-        console.load('whisper model loading.')
+        print('loaded.')
+        print('whisper model loading...', end=' ')
         self.model = whisper.load_model(model_name)
-        console.load('whisper model loaded.')
+        print('loaded.')
         self.loaded = True
 
     def transcribe(self, audio_data):
         print('converting speech to text...')
-        self.result = self.model.transcribe(audio_data)
+        self.result = self.model.transcribe(audio_data,
+                                            fp16=False,
+                                            language='en')
         return self.result['text']
 
 class SpeechToTextServer(Server):
@@ -42,6 +48,11 @@ class SpeechToTextServer(Server):
         Message will be a bytestring (buffer) streamed by client
         (perhaps via live microphone recording).
         """
+        from wav_utils import save_wav
+        print('saving wav file...', end=' ')
+        save_wav(message, 'test_1ch_16000hz.wav')
+        print('saved.')
+
         audio_array = normalize(buffer_to_array(message))
         transcript = self.speech_to_text(audio_array)
         return transcript

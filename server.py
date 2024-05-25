@@ -29,7 +29,7 @@ class Server:
         return self._running.is_set()
 
     def serve(self):
-        print(f"Server is listening on {self.host}:{self.port}")
+        print(f"\nServer is listening on {self.host}:{self.port}")
         self._running.set()
         threading.Thread(target=self._serve).start()
 
