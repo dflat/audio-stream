@@ -18,7 +18,7 @@ def register_graceful_exit_on_close(cleanup_callback):
 def register_graceful_exit_on_kill(cleanup_callback):
     def signal_handler(signal, frame):
         print(f"Cleaning up and exiting after kill signal: {signal}")
-        cleaup_callback()
+        cleanup_callback()
         sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)
