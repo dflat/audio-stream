@@ -1,15 +1,25 @@
 import atexit
+import signal
+import sys
 
-def register(cleanup_func):
+
+def register(cleanup_callback):
     # Register with atexit
-    atexit.register(cleanup_func)
+    register_graceful_exit_on_close(cleanup_callback)
+    # Register with signal
+    register_graceful_exit_on_kill(cleanup_callback)
 
-def register_ipython(cleanup_func): # not working
-    # Register with IPython if available
-    ip = get_ipython()
-    if ip is not None:
-        def ipython_cleanup():
-            print("Running IPython cleanup...")
-            cleanup_func()
+# atext handler
+def register_graceful_exit_on_close(cleanup_callback):
+    # Register with atexit
+    atexit.register(cleanup_callback)
 
-        ip.events.register('terminal', ipython_cleanup)
+# SIGINT / kill / ctrl-C handler
+def register_graceful_exit_on_kill(cleanup_callback):
+    def signal_handler(signal, frame):
+        print(f"Cleaning up and exiting after kill signal: {signal}")
+        cleaup_callback()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
