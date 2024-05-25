@@ -15,6 +15,12 @@ class Server:
         self._running = threading.Event()
         self.sentinel_message = b'x_end_x'
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # Avoid the error when restarting server by setting SO_REUSEADDR flag: 
+        #   OSError: [Errno 48] Address already in use
+        self.server_socket.setsockopt(socket.SOL_SOCKET,
+                                        socket.SO_REUSEADDR, 1)
+
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen(5)  # Listen for up to 5 connections
 
@@ -87,29 +93,3 @@ class Server:
         Override in subclass to do something besides echo message back to client.
         """
         return message  # Echo the message back for now
-
-class SpeechToTextServer(Server):
-    def __init__(self, host='', port=PORT, chunk_size=CHUNK_SIZE):
-        super().__init__(host, port, chunk_size)
-
-    def sequential_send(self, sequence):
-        for token in sequence:
-            pass
-
-    def speech_to_text(self, buffer):
-        print('converting speech to text...')
-        self.buffer = buffer
-        # call whisper here...TODO
-        # trancript = whisper(...)
-        # return transcript
-
-    def _process_message(self, message):
-        """
-        Message will be a bytestring (buffer) streamed by client
-        (perhaps via live microphone recording).
-        """
-        transcript = self.speech_to_text(message)
-
-if __name__ == "__main__":
-    server = SpeechToTextServer(host='127.0.0.1', port=5000)
-    server.serve()
