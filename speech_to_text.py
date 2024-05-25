@@ -8,7 +8,7 @@ class Whisper:
         self.loaded = False
         self._init_model(model_name)
 
-    def _init_model(self, model_name)
+    def _init_model(self, model_name):
         import whisper
         console.load('whisper model loading.')
         self.model = whisper.load_model(model_name)
@@ -52,7 +52,7 @@ class QueuedSpeechToTextServer(SpeechToTextServer):
                         port=PORT,
                         chunk_size=CHUNK_SIZE):
 
-        super().__init__(host, port, chunk_size)
+        super().__init__(host=host, port=port, chunk_size=chunk_size)
         self.q = q or queue.Queue()
 
     def _send(self, client_socket, response):
@@ -71,6 +71,8 @@ def normalize(arr):
     return arr.astype(np.float32) / np.iinfo(np.int16).max
 
 if __name__ == "__main__":
-    server = SpeechToTextServer(host='127.0.0.1', port=5000)
+    q = queue.Queue()
+    server = QueuedSpeechToTextServer(q=q, host='127.0.0.1',
+                                            port=PORT)
     server.serve()
 
