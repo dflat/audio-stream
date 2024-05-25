@@ -23,8 +23,8 @@ class KeyboardListener:
 
     def _init_platform_specific_kb_options(self): 
         self.kb_options = { }
-        if sys.platform == 'win32':
-            self.kb_options['win32_event_filter'] = self.win32_event_filter
+        #if sys.platform == 'win32':
+        #    self.kb_options['win32_event_filter'] = self.win32_event_filter
         elif sys.platform == 'darwin':
             self.kb_options['darwin_intercept'] = self.darwin_intercept
             
