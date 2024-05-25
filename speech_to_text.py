@@ -4,6 +4,7 @@ import numpy as np
 print('loaded.')
 from config import PORT, CHUNK_SIZE, WHISPER_MODEL
 import queue
+import threading
 
 class Whisper:
     def __init__(self, model_name=WHISPER_MODEL):
@@ -81,9 +82,16 @@ def buffer_to_array(buffer, dtype=np.int16):
 def normalize(arr):
     return arr.astype(np.float32) / np.iinfo(np.int16).max
 
+def continuous_transcribe():
+    while server.running:
+        print('waiting for speech transmission...')
+        transcript = q.get()
+        print('Got:', transcript)
+
 if __name__ == "__main__":
     q = queue.Queue()
     server = QueuedSpeechToTextServer(q=q, host='127.0.0.1',
                                             port=PORT)
     server.serve()
+    continuous_transcribe()
 
