@@ -180,6 +180,7 @@ class StreamingAudioRecorder(BaseAudioRecorder):
         self.server_ip = server_ip
         self.server_port = server_port
         self.socket = None
+        self.waiting_for_response = False
 
     def open_socket(self):
         """
@@ -195,6 +196,11 @@ class StreamingAudioRecorder(BaseAudioRecorder):
     ### The below four methods ovverride BaseAudioRecorder methods: 
     ##      _init, _start, _handle_data, _stop
     
+    def record(self):
+        if self.waiting_for_response:
+            return print('Transcribing...ignoring request to record.')
+        super().record()
+
     def _init(self):
         self.open_socket()
 
@@ -212,7 +218,9 @@ class StreamingAudioRecorder(BaseAudioRecorder):
         #self.close_socket()
 
     def _receive_response(self):
+        self.waiting_for_response = True
         self.response = Record.read_from_socket(self.socket)
+        self.waiting_for_response = False
         print('\nGot:', self.response.decode('utf-8'))
    
     ##
