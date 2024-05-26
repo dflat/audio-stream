@@ -19,7 +19,7 @@ class Record:
 
     @classmethod
     def send_over_socket(cls, sock: socket.socket, payload: bytes):
-        sock.send(cls._prepend_size(payload))
+        sock.sendall(cls._prepend_size(payload))
 
     @classmethod
     def read_from_socket(cls, sock: socket.socket) -> Union[bytes, None]:
