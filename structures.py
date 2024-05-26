@@ -1,11 +1,12 @@
 import struct
-from typing import Union
 import socket
+from typing import Union
 
 class Record:
     """
     Static class, providing an interface for streaming chunks of variable
         size over the network. Uses an end_of_transmission signal.
+
     Main public API usage:
         Given a socket object, (sock), and some bytes (payload):
             Record.send_over_socket(sock, payload) 
@@ -28,10 +29,10 @@ class Record:
             if len(size_bytes) < 4:
                 raise ConnectionError("Incomplete size data received")
 
-            if size_bytes == cls.end_of_transmission:
+            size = cls._read_size(size_bytes)
+            if size == cls.end_of_transmission:
                 return None
 
-            size = cls._read_size(size_bytes)
             payload = cls._receive(sock, size)
 
             return payload
