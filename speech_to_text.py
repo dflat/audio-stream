@@ -36,15 +36,11 @@ class SpeechToTextServer(SequenceInMessageOutServer):
         super().__init__(host, port, chunk_size)
         self.stt_model = Whisper(model_name)
 
-    def sequential_send(self, sequence):
-        for token in sequence:
-            pass
-
     def speech_to_text(self, audio_array):
         transcript = self.stt_model.transcribe(audio_array)
         return transcript
 
-    def _process_message(self, message: bytes) -> bytes:
+    def _process(self, message: bytes) -> bytes:
         """
         Message will be a completed bytes object (buffer),
         streamed by client (perhaps via live microphone recording).
