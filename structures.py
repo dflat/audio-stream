@@ -9,11 +9,11 @@ class Record:
     Main public API usage:
         Given a socket object, (sock), and some bytes (payload):
             Record.send_over_socket(sock, payload) 
-            Record.read_from_socket(sock)
+            payload = Record.read_from_socket(sock)
         When read_from_socket returns None, transmission is complete.
     """
     size_prefix_type = '!I'  # 32-bit unsigned integer, big-endian
-    size_bytes = struct.calcsize(size_prefix_type)
+    prefix_size = struct.calcsize(size_prefix_type)
     end_of_transmission = 0x00000000
 
     @classmethod
@@ -23,7 +23,7 @@ class Record:
     @classmethod
     def read_from_socket(cls, sock: socket.socket) -> Union[bytes, None]:
         try:
-            size_bytes = sock.recv(cls.size)
+            size_bytes = sock.recv(cls.prefix_size)
 
             if len(size_bytes) < 4:
                 raise ConnectionError("Incomplete size data received")
