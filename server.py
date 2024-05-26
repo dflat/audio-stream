@@ -84,32 +84,24 @@ class Server:
                     print('Server got sentinel shutdown signal.')
                     return client_socket.close()
 
-                response = self._process_message(message)
-                if response is not None:
-                    self._send(client_socket, response)
+                message = self._process(message)
+                self._send(client_socket, message)
 
         except Exception as e:
             print(f"Error handling client: {e}")
             raise
 
         finally:
-            client_socket.close()
+            client_socket.close() # maybe don't close on server
+
+    def _process(self, message):
+        return message
 
     def _receive(self, client_socket):
         return Record.read_from_socket(client_socket)
 
     def _send(self, client_socket, response):
-        """
-        Override to do something different (e.g. save response 
-        in _process_message and have _send be a no-op).
-        """
         Record.send_over_socket(client_socket, response)
-
-    def _process_message(self, message: bytes) -> bytes:
-        """
-        Override in subclass to do something besides echo message back to client.
-        """
-        return message  # Echo the message back for now
 
 class MessageInSequenceOutServer(Server):
     """
@@ -117,8 +109,17 @@ class MessageInSequenceOutServer(Server):
         Receive as input a text prompt, and run through a GPT,
         respond with a stream of GPT-generated tokens.
     """
-    def _process_message(self):
+    def get_sequence(self, message):
+        """
+        Implement in subclass.
+        """
         raise NotImplementedError()
+
+    def _send(self, client_socket, message):
+        for token in self.get_sequence(message):
+            super()._send(client_socket, token.encode("utf-8"))
+        Record.end_transmission(client_socket)
+
 
 class SequenceInMessageOutServer(Server):
     """
@@ -132,7 +133,7 @@ class SequenceInMessageOutServer(Server):
         """
         chunks = []
         while True:
-            chunk = Record.read_from_socket(client_socket)
+            chunk = super()._receive(client_socket)
             if chunk is None: # got end of transmission
                 return b''.join(chunks)
             chunks.append(chunk)
