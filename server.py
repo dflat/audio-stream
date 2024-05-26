@@ -105,7 +105,7 @@ class Server:
         """
         Record.send_over_socket(client_socket, response)
 
-    def _process_message(self, message):
+    def _process_message(self, message: bytes) -> bytes:
         """
         Override in subclass to do something besides echo message back to client.
         """
