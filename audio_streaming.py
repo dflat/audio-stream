@@ -207,7 +207,13 @@ class StreamingAudioRecorder(BaseAudioRecorder):
 
     def _stop(self):
         super()._stop()
-        self.close_socket()
+        Record.end_transmission(self.socket)
+        self._receive_response()
+        #self.close_socket()
+
+    def _receive_response(self):
+        self.response = Record.read_from_socket(self.socket)
+        print('\nGot:\n\t', self.response)
    
     ##
     ### END Overridden BaseAudioRecorder methods.
