@@ -1,5 +1,6 @@
 import struct
 import socket
+import math
 from typing import Union
 
 class Record:
@@ -38,8 +39,14 @@ class Record:
             return payload
 
         except Exception as e:
-            print("Error: {e}")
+            print(f"Error: {e}")
             sock.close()
+            print('socket closed by exception in Record.read_from_socket')
+            raise
+
+    @classmethod
+    def end_transmission(cls, sock: socket.socket):
+        self.send_over_socket(sock, b'')
 
     @classmethod
     def _receive(cls, sock: socket.socket, size: int):
@@ -54,7 +61,7 @@ class Record:
             if bytes_remaining == 0:
                 break
 
-            chunk = sock.recv(Math.min(4096, bytes_remaining))
+            chunk = sock.recv(min(4096, bytes_remaining))
             if not chunk:
                 raise ConnectionError("Connection closed before receiving full payload")
 
@@ -69,7 +76,7 @@ class Record:
         Use just after receiving (4) bytes from network socket.
         (4 is assuming size_prefix_type is an unsigned int (e.g., !I or I)).
         """
-        return struct.unpack(cls.size_prefix_type, size_prefix)
+        return struct.unpack(cls.size_prefix_type, size_prefix)[0]
 
     @classmethod
     def _prepend_size(cls, payload: bytes) -> bytes:
