@@ -213,7 +213,7 @@ class StreamingAudioRecorder(BaseAudioRecorder):
 
     def _receive_response(self):
         self.response = Record.read_from_socket(self.socket)
-        print('\nGot:\n\t', self.response)
+        print('\nGot:', self.response.decode('utf-8'))
    
     ##
     ### END Overridden BaseAudioRecorder methods.
