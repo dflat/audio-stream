@@ -2,6 +2,7 @@ import socket
 import threading
 from config import PORT, CHUNK_SIZE
 import teardown
+from structures import Record
 
 class Server:
     def __init__(self, host='', # Empty string to listen on all network interfaces.
@@ -73,20 +74,14 @@ class Server:
             client_socket.close()
 
     def _receive(self, client_socket):
-        chunks = []
-        while True:
-            chunk = client_socket.recv(self.chunk_size)
-            if not chunk:
-                break
-            chunks.append(chunk)
-        return b''.join(chunks)
+        return Record.read_from_socket(client_socket)
 
     def _send(self, client_socket, response):
         """
         Override to do something different (e.g. save response 
         in _process_message and have _send be a no-op).
         """
-        client_socket.sendall(response)
+        Record.send_over_socket(response)
 
     def _process_message(self, message):
         """
