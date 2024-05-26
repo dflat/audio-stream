@@ -1,4 +1,4 @@
-from server import Server
+from server import SequenceInMessageOutServer
 print('importing numpy...', end=' ')
 import numpy as np
 print('loaded.')
@@ -27,7 +27,7 @@ class Whisper:
                                             language='en')
         return self.result['text']
 
-class SpeechToTextServer(Server):
+class SpeechToTextServer(SequenceInMessageOutServer):
     def __init__(self, model_name=WHISPER_MODEL,
                         host='',
                         port=PORT,
@@ -46,8 +46,8 @@ class SpeechToTextServer(Server):
 
     def _process_message(self, message):
         """
-        Message will be a bytestring (buffer) streamed by client
-        (perhaps via live microphone recording).
+        Message will be a completed bytes object (buffer),
+        streamed by client (perhaps via live microphone recording).
         """
         from wav_utils import save_wav
         print('saving wav file...', end=' ')
