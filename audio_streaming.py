@@ -3,7 +3,7 @@ import wave
 import time
 import socket
 import threading
-from config import PORT, AUDIO_SAMPLE_RATE, CHANNELS, AUDIO_CHUNK_SIZE
+from config import PORT, AUDIO_SAMPLE_RATE, CHANNELS, AUDIO_CHUNK_SIZE, WHISPER_HOST
 from pydub import AudioSegment
 from key_input import KeyboardListener
 
@@ -251,5 +251,6 @@ if __name__ == "__main__":
     #local_recorder.record_and_save("test_audio", duration=5)
 
     # Example usage for streaming audio
-    streaming_recorder = KeyedStreamingAudioRecorder(key='r')
+    streaming_recorder = KeyedStreamingAudioRecorder(key='r',
+                                                     server_ip=WHISPER_HOST)
     streaming_recorder.standby(one_shot=False)
