@@ -1,10 +1,27 @@
+"""
+Servers come in four varieties:
+    MIMO (Message In Message Out)   : message input  -> message response
+    MISO (Message In Sequence Out)  : message input  -> streamed response
+    SIMO (Sequence In Message Out)  : streamed input -> message response
+    SISO (Sequence In Sequence Out) : steramed input -> streamed response
+
+    The normal server class, Server, is MIMO. The other varieties are
+    subclasses of Server, found below.
+"""
 import socket
 import threading
-from config import PORT, CHUNK_SIZE
 import teardown
+from config import PORT, CHUNK_SIZE
 from structures import Record
 
 class Server:
+    """
+    Message In Message Out server. (Normal Server)
+
+    Example Use Case:
+        client sends a text request ->
+        returns a text response, and ends the connection.
+    """
     def __init__(self, host='', # Empty string to listen on all network interfaces.
                        port=PORT,
                        chunk_size=CHUNK_SIZE):
@@ -44,10 +61,11 @@ class Server:
         sentinel_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             sentinel_socket.connect(('localhost', self.port))
-            sentinel_socket.sendall(self.sentinel_message)
+            self._send(sentinel_socket, self.sentinel_message)
+            #sentinel_socket.sendall(self.sentinel_message)
         except Exception as e:
             print(f"Error sending shutdown sentinel: {e}")
-
+            raise
 
     def _serve(self):
         while self.running:
@@ -65,11 +83,15 @@ class Server:
                 if message == self.sentinel_message:
                     print('Server got sentinel shutdown signal.')
                     return client_socket.close()
+
                 response = self._process_message(message)
                 if response:
                     self._send(client_socket, response)
+
         except Exception as e:
             print(f"Error handling client: {e}")
+            raise
+
         finally:
             client_socket.close()
 
@@ -81,10 +103,39 @@ class Server:
         Override to do something different (e.g. save response 
         in _process_message and have _send be a no-op).
         """
-        Record.send_over_socket(response)
+        Record.send_over_socket(client_socket, response)
 
     def _process_message(self, message):
         """
         Override in subclass to do something besides echo message back to client.
         """
         return message  # Echo the message back for now
+
+class MessageInSequenceOutServer(Server):
+    """
+    Example Use Case:
+        Receive as input a text prompt, and run through a GPT,
+        respond with a stream of GPT-generated tokens.
+    """
+    def _process_message(self):
+        raise NotImplementedError()
+
+class SequenceInMessageOutServer(Server):
+    """
+    Example Use Case:
+        Receive as input an audio stream (e.g., from microphone capture),
+        and run a speech-to-text conversion -> return text transcript response.
+    """
+    def _receive(self, client_socket):
+        """
+        Receive stream chunks in a loop until end of transmission signal.
+        """
+        chunks = []
+        while True:
+            chunk = Record.read_from_socket(client_socket)
+            if chunk is None: # got end of transmission
+                return b''.join(chunks)
+            chunks.append(chunk)
+
+class SequenceInSequenceOutServer(Server):
+    pass
