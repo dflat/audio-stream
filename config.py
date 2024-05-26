@@ -3,6 +3,9 @@ HOST = 'localhost'
 PORT = 5000
 CHUNK_SIZE = 8192
 
+# whisper
+WHISPER_HOST = '192.168.1.219'
+
 # GPT token generation server
 OUTPUT_HOST = ''
 OUTPUT_PORT = 6000
