@@ -50,9 +50,14 @@ class Record:
         bytes_read = 0
 
         while bytes_read < size:
-            chunk = sock.recv(size - bytes_read)
+            bytes_remaining = size - bytes_read
+            if bytes_remaining == 0:
+                break
+
+            chunk = sock.recv(Math.min(4096, bytes_remaining))
             if not chunk:
                 raise ConnectionError("Connection closed before receiving full payload")
+
             bytes_read += len(chunk)
             chunks.append(chunk)
 
