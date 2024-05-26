@@ -6,6 +6,7 @@ import threading
 from config import PORT, AUDIO_SAMPLE_RATE, CHANNELS, AUDIO_CHUNK_SIZE, WHISPER_HOST
 from pydub import AudioSegment
 from key_input import KeyboardListener
+from structures import Record
 
 class BaseAudioRecorder:
     """
@@ -201,7 +202,8 @@ class StreamingAudioRecorder(BaseAudioRecorder):
         super()._start()
 
     def _handle_data(self, data):
-        self.socket.sendall(data)
+        #self.socket.sendall(data)
+        Record.send_over_socket(self.socket, data)
 
     def _stop(self):
         super()._stop()
