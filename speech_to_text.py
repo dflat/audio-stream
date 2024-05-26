@@ -92,9 +92,12 @@ def continuous_transcribe():
             break
 
 if __name__ == "__main__":
-    q = queue.Queue()
-    server = QueuedSpeechToTextServer(q=q, host='',
-                                            port=PORT)
+    #q = queue.Queue()
+    #server = QueuedSpeechToTextServer(q=q, host='',
+    #                                        port=PORT)
+    #server.serve()
+    #continuous_transcribe()
+    server = SpeechToTextServer(host='', port=PORT)
     server.serve()
-    continuous_transcribe()
+
 
