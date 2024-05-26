@@ -84,9 +84,12 @@ def normalize(arr):
 
 def continuous_transcribe():
     while server.running:
-        print('waiting for speech transmission...')
-        transcript = q.get()
-        print('Got:', transcript)
+        try:
+            print('waiting for speech transmission...')
+            transcript = q.get()
+            print('Got:', transcript)
+        except KeyboardInterrupt:
+            break
 
 if __name__ == "__main__":
     q = queue.Queue()
