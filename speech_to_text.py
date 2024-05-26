@@ -44,7 +44,7 @@ class SpeechToTextServer(SequenceInMessageOutServer):
         transcript = self.stt_model.transcribe(audio_array)
         return transcript
 
-    def _process_message(self, message):
+    def _process_message(self, message: bytes) -> bytes:
         """
         Message will be a completed bytes object (buffer),
         streamed by client (perhaps via live microphone recording).
@@ -56,7 +56,7 @@ class SpeechToTextServer(SequenceInMessageOutServer):
 
         audio_array = normalize(buffer_to_array(message))
         transcript = self.speech_to_text(audio_array)
-        return transcript
+        return transcript.encode('utf-8')
 
 class QueuedSpeechToTextServer(SpeechToTextServer):
     def __init__(self, q=None,
