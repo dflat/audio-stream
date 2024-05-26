@@ -1,5 +1,5 @@
 # network
-HOST = 'localhost'
+HOST = ''
 PORT = 5000
 CHUNK_SIZE = 8192
 
