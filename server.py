@@ -85,7 +85,7 @@ class Server:
                     return client_socket.close()
 
                 response = self._process_message(message)
-                if response:
+                if response is not None:
                     self._send(client_socket, response)
 
         except Exception as e:
