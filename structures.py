@@ -16,7 +16,7 @@ class Record:
     """
     size_prefix_type = '!I'  # 32-bit unsigned integer, big-endian
     prefix_size = struct.calcsize(size_prefix_type)
-    end_of_transmission = 0x00000000
+    end_of_transmission = 2**32 - 1
 
     @classmethod
     def send_over_socket(cls, sock: socket.socket, payload: bytes):
@@ -46,7 +46,8 @@ class Record:
 
     @classmethod
     def end_transmission(cls, sock: socket.socket):
-        cls.send_over_socket(sock, b'')
+        sentinel = struct.pack(cls.size_prefix_type, cls.end_of_transmission)
+        cls.send_over_socket(sock, sentinel) 
 
     @classmethod
     def _receive(cls, sock: socket.socket, size: int):
