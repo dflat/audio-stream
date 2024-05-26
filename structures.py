@@ -46,7 +46,7 @@ class Record:
 
     @classmethod
     def end_transmission(cls, sock: socket.socket):
-        self.send_over_socket(sock, b'')
+        cls.send_over_socket(sock, b'')
 
     @classmethod
     def _receive(cls, sock: socket.socket, size: int):
