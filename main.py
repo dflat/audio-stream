@@ -4,6 +4,7 @@ from config import WHISPER_HOST, GPT_HOST
 from parsing import SentenceParser
 import sys
 import time
+from threading import Thread, Event
 
 def typewriter_effect(sequence, delay=None):
     tokens = []
@@ -19,12 +20,20 @@ def typewriter_effect(sequence, delay=None):
             time.sleep(delay)
    
 
+def typewriter_print(sentence, done_event=None, delay=0.1):
+    for word in sentence.split():
+        print(word, end=' ', flush=True)
+        time.sleep(delay)
+    if done_event:
+        done_event.set()
 
 def run():
     streaming_recorder = KeyedStreamingAudioRecorder(key='r',
                                                      server_ip=WHISPER_HOST)
     streaming_recorder.standby(one_shot=False)
     parser = SentenceParser()
+    done = Event()
+    done.set()
     while True:
         prompt = streaming_recorder.q.get()
         client = Client(GPT_HOST, 5000)
@@ -33,8 +42,13 @@ def run():
         for token in token_seq:
             sentence = parser.feed(token.decode("utf-8"))
             if sentence is not None:
-                print(sentence, end='', flush=True)
-        print(parser.end(), end='', flush=True)
-        print(f"token count: {len(parser.tokens)}")
+                done.wait()
+                done.clear()
+                Thread(target=typewriter_print, args=(sentence, done)).start()
+        sentence = parser.end()
+        done.clear()
+        Thread(target=typewriter_print, args=(sentence, done)).start()
+        done.wait()
+        print(f"\n(token count: {len(parser.tokens)})")
         parser.reset()
 
