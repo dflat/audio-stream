@@ -1,44 +1,32 @@
 import socket
 from config import HOST, PORT, CHUNK_SIZE
+from structures import Record
 
 class Client:
-    def __init__(self, host=HOST, port=PORT, chunk_size=CHUNK_SIZE):
+    def __init__(self, host: str=HOST,
+                       port: int=PORT,
+                       chunk_size: int=CHUNK_SIZE):
+
         self.host = host
         self.port = port
         self.chunk_size = chunk_size
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((self.host, self.port))
+        self._connect()
 
-    def send(self, data):
+    def _connect(self) -> None:
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((self.host, self.port))
+
+    def send(self, data: bytes) -> None:
         try:
-            self.client_socket.sendall(data)
+            Record.send_over_socket(self.sock, data)
         except Exception as e:
-            print(f"Error sending data: {e}")
+            print(f"Client encountered error sending data: {e}")
 
-    def receive(self):
-        response_chunks = []
-        while True:
-            chunk = self.client_socket.recv(self.chunk_size)
-            if not chunk:
-                break
-            response_chunks.append(chunk)
-        response = b''.join(response_chunks)
-        return response
+    def receive(self) -> bytes:
+        return Record.read_from_socket(self.sock)
 
-    def close(self):
-        self.client_socket.close()
+    def end_transmission(self) -> None:
+        Record.end_transmission(self.sock)
 
-if __name__ == "__main__":
-    # Example usage
-    client = Client(HOST, PORT)
-    
-    # Simulating sending audio data (as bytes)
-    audio_data = b'This is a simulated audio byte stream'
-    client.send(audio_data)
-    
-    # Receiving the response
-    response = client.receive()
-    print(f"Received response: {response}")
-    
-    # Closing the connection
-    client.close()
+    def close(self) -> None:
+        self.sock.close()
