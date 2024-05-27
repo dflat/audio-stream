@@ -25,9 +25,9 @@ class Record:
     @classmethod
     def read_from_socket(cls, sock: socket.socket) -> Union[bytes, None]:
         try:
-            prefix_bytes = sock.recv(cls.n_prefix_bytes)
+            #prefix_bytes = sock.recv(cls.n_prefix_bytes)
             #maybe this fixes common error here
-            #prefix_bytes = Record._receive(sock, cls.n_prefix_bytes)
+            prefix_bytes = Record._receive(sock, cls.n_prefix_bytes)
 
 
             if len(prefix_bytes) < cls.n_prefix_bytes:
