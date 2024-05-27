@@ -15,7 +15,7 @@ class Record:
         When read_from_socket returns None, transmission is complete.
     """
     size_prefix_type = '!I'  # 32-bit unsigned integer, big-endian
-    prefix_size = struct.calcsize(size_prefix_type)
+    n_prefix_bytes = struct.calcsize(size_prefix_type)
     end_of_transmission = 0xffffffff # sentinel: 32 bits, all set
 
     @classmethod
@@ -25,12 +25,12 @@ class Record:
     @classmethod
     def read_from_socket(cls, sock: socket.socket) -> Union[bytes, None]:
         try:
-            size_bytes = sock.recv(cls.prefix_size)
+            prefix_bytes = sock.recv(cls.n_prefix_bytes)
 
-            if len(size_bytes) < 4:
+            if len(prefix_bytes) < cls.n_prefix_bytes:
                 raise ConnectionError("Incomplete size data received")
 
-            size = cls._read_size(size_bytes)
+            size = cls._unpack_size(prefix_bytes)
             if size == cls.end_of_transmission:
                 return None
 
@@ -72,7 +72,7 @@ class Record:
         return b''.join(chunks) 
 
     @classmethod
-    def _read_size(cls, size_prefix: bytes) -> int:
+    def _unpack_size(cls, size_prefix: bytes) -> int:
         """
         Use just after receiving (4) bytes from network socket.
         (4 is assuming size_prefix_type is an unsigned int (e.g., !I or I)).
