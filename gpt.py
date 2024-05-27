@@ -48,7 +48,7 @@ class GPT:
         end = time.time()
         print(f"finished pinging {end-start:.1f} seconds")
 
-    def get_tokens(self, prompt):
+    def get_tokens(self, prompt: str) -> Generator[bytes, None, None]:
         yield from self.model.generate(prompt = prompt, **self.settings)
 
     def end_session(self):
@@ -63,4 +63,5 @@ class GPTServer(MessageInSequenceOutServer):
         self.gpt = GPT()
         
     def _process(self, message: bytes) -> Generator[bytes, None, None]:
-    	return (token.encode('utf-8') for token in self.gpt.get_tokens(message))
+    	return (token.encode('utf-8') for token in 
+                self.gpt.get_tokens(message.decode('utf-8')))
