@@ -1,6 +1,7 @@
 import socket
 from config import HOST, PORT, CHUNK_SIZE
 from structures import Record
+from typing import Iterable
 
 class Client:
     def __init__(self, host: str=HOST,
@@ -24,6 +25,13 @@ class Client:
 
     def receive(self) -> bytes:
         return Record.read_from_socket(self.sock)
+
+    def receive_stream(self) -> Iterable[bytes]:
+        while True:
+            data = self.receive()
+            if data is None:
+                break
+            yield data
 
     def end_transmission(self) -> None:
         Record.end_transmission(self.sock)
