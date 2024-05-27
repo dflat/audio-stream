@@ -10,6 +10,7 @@ WHISPER_HOST = '192.168.1.219'
 OUTPUT_HOST = ''
 OUTPUT_PORT = 6000
 GPT_FINISH = 'x_end_x'
+GPT_HOST = '192.168.1.176'
 
 # audio
 AUDIO_SAMPLE_RATE = 16000 # Sample rate that Whisper requires
