@@ -13,6 +13,7 @@ import threading
 import teardown
 from config import PORT, CHUNK_SIZE
 from structures import Record
+from typing import Generator
 
 class Server:
     """
