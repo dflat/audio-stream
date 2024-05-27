@@ -34,10 +34,10 @@ class SpeechToTextServer(SequenceInMessageOutServer):
                         chunk_size=CHUNK_SIZE):
 
         super().__init__(host, port, chunk_size)
-        self.stt_model = Whisper(model_name)
+        self.stt = Whisper(model_name)
 
     def speech_to_text(self, audio_array):
-        transcript = self.stt_model.transcribe(audio_array)
+        transcript = self.stt.transcribe(audio_array)
         return transcript
 
     def _process(self, message: bytes) -> bytes:
