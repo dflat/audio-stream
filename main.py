@@ -1,6 +1,7 @@
 from client import Client
 from audio_streaming import KeyedStreamingAudioRecorder
 from config import WHISPER_HOST, GPT_HOST
+from parsing import SentenceParser
 import sys
 import time
 
@@ -23,9 +24,17 @@ def run():
     streaming_recorder = KeyedStreamingAudioRecorder(key='r',
                                                      server_ip=WHISPER_HOST)
     streaming_recorder.standby(one_shot=False)
+    parser = SentenceParser()
     while True:
         prompt = streaming_recorder.q.get()
         client = Client(GPT_HOST, 5000)
         client.send(prompt)
         token_seq = client.receive_stream()
-        typewriter_effect(token_seq)
+        for token in token_seq:
+            sentence = parser.feed(token.decode("utf-8"))
+            if sentence is not None:
+                print(sentence, end='', flush=True)
+        print(parser.end(), end='', flush=True)
+        print(f"token count: {len(parser.tokens)}")
+        parser.reset()
+
