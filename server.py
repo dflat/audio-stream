@@ -114,10 +114,10 @@ class MessageInSequenceOutServer(Server):
         Receive as input a text prompt, and run through a GPT,
         respond with a stream of GPT-generated tokens.
     """
-    def _process(self, message: bytes) -> Generator[bytes]:
+    def _process(self, message: bytes) -> Generator[bytes, None, None]:
         raise NotImplementedError()
 
-    def _send(self, client_socket, sequence: Generator[bytes]) -> None:
+    def _send(self, client_socket, sequence: Generator[bytes, None, None]) -> None:
         for message in sequence:
             super()._send(client_socket, message)
         Record.end_transmission(client_socket)
