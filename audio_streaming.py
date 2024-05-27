@@ -179,7 +179,7 @@ class StreamingAudioRecorder(BaseAudioRecorder):
         super().__init__(rate, channels, chunk)
         self.server_ip = server_ip
         self.server_port = server_port
-        self.socket = None
+        self.client = None
         self.waiting_for_response = False
 
     def open_socket(self):
@@ -187,11 +187,10 @@ class StreamingAudioRecorder(BaseAudioRecorder):
         Creates a TCP Socket to stream audio data over a network,
         incrementally, as it is recorded from a microphone input source.
         """
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.server_ip, self.server_port))
+        self.client = Client(self.server_ip, self.server_port)
 
     def close_socket(self):
-        self.socket.close()
+        self.client.close()
 
     ### The below four methods ovverride BaseAudioRecorder methods: 
     ##      _init, _start, _handle_data, _stop
@@ -208,19 +207,18 @@ class StreamingAudioRecorder(BaseAudioRecorder):
         super()._start()
 
     def _handle_data(self, data):
-        #self.socket.sendall(data)
-        Record.send_over_socket(self.socket, data)
+        self.client.send(data)
 
     def _stop(self):
         super()._stop()
-        Record.end_transmission(self.socket)
+        self.client.end_transmission()
         self._receive_response()
-        #self.close_socket()
 
     def _receive_response(self):
         self.waiting_for_response = True
-        self.response = Record.read_from_socket(self.socket)
+        self.response = self.client.read() 
         self.waiting_for_response = False
+        self.close_socket()
         print('\nGot:', self.response.decode('utf-8'))
    
     ##
