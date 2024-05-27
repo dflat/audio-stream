@@ -65,3 +65,7 @@ class GPTServer(MessageInSequenceOutServer):
     def _process(self, message: bytes) -> Generator[bytes, None, None]:
     	return (token.encode('utf-8') for token in 
                 self.gpt.get_tokens(message.decode('utf-8')))
+
+if __name__ == '__main__':
+    gpt = GPTServer()
+    gpt.serve()
