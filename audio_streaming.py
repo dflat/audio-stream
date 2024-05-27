@@ -6,6 +6,7 @@ from config import PORT, AUDIO_SAMPLE_RATE, CHANNELS, AUDIO_CHUNK_SIZE, WHISPER_
 from pydub import AudioSegment
 from key_input import KeyboardListener
 from client import Client
+import queue
 
 class BaseAudioRecorder:
     """
@@ -180,6 +181,7 @@ class StreamingAudioRecorder(BaseAudioRecorder):
         self.server_port = server_port
         self.client = None
         self.waiting_for_response = False
+        self.q = queue.Queue()
 
     def open_socket(self):
         """
@@ -218,6 +220,7 @@ class StreamingAudioRecorder(BaseAudioRecorder):
         self.response = self.client.receive() 
         self.waiting_for_response = False
         self.close_socket()
+        self.q.put(self.response)
         print('\nGot:', self.response.decode('utf-8'))
    
     ##
