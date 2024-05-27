@@ -215,7 +215,7 @@ class StreamingAudioRecorder(BaseAudioRecorder):
 
     def _receive_response(self):
         self.waiting_for_response = True
-        self.response = self.client.read() 
+        self.response = self.client.receive() 
         self.waiting_for_response = False
         self.close_socket()
         print('\nGot:', self.response.decode('utf-8'))
