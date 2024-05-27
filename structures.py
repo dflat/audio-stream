@@ -26,9 +26,14 @@ class Record:
     def read_from_socket(cls, sock: socket.socket) -> Union[bytes, None]:
         try:
             prefix_bytes = sock.recv(cls.n_prefix_bytes)
+            #maybe this fixes common error here
+            #prefix_bytes = Record._receive(sock, cls.n_prefix_bytes)
+
 
             if len(prefix_bytes) < cls.n_prefix_bytes:
-                raise ConnectionError("Incomplete size data received")
+                raise ConnectionError(
+                    f"Incomplete size data received, "
+                    f"only read {len(prefix_bytes)} bytes.")
 
             size = cls._unpack_size(prefix_bytes)
             if size == cls.end_of_transmission:
