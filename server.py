@@ -30,14 +30,14 @@ class Server:
         self.host = host
         self.port = port
         self.chunk_size = chunk_size
+        self.keep_alive = False # maybe make True
         self._running = threading.Event()
         self.sentinel_message = b'x_end_x'
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # Avoid the error when restarting server by setting SO_REUSEADDR flag: 
         #   OSError: [Errno 48] Address already in use
-        self.server_socket.setsockopt(socket.SOL_SOCKET,
-                                        socket.SO_REUSEADDR, 1)
+        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen(5)  # Listen for up to 5 connections
@@ -86,13 +86,17 @@ class Server:
 
                 message = self._process(message)
                 self._send(client_socket, message)
+            else:
+                print('Message was nullish value')
 
         except Exception as e:
             print(f"Error handling client: {e}")
+            client_socket.close() 
             raise
 
         finally:
-            client_socket.close() # maybe don't close on server
+            if not self.keep_alive:
+                client_socket.close() # maybe don't close on server
 
     def _process(self, message):
         return message
@@ -109,15 +113,12 @@ class MessageInSequenceOutServer(Server):
         Receive as input a text prompt, and run through a GPT,
         respond with a stream of GPT-generated tokens.
     """
-    def get_sequence(self, message):
-        """
-        Implement in subclass.
-        """
+    def _process(self, message: bytes) -> Generator[bytes]:
         raise NotImplementedError()
 
-    def _send(self, client_socket, message):
-        for token in self.get_sequence(message):
-            super()._send(client_socket, token.encode("utf-8"))
+    def _send(self, client_socket, sequence: Generator[bytes]) -> None:
+        for message in sequence:
+            super()._send(client_socket, message)
         Record.end_transmission(client_socket)
 
 
