@@ -1,6 +1,6 @@
 from client import Client
 from audio_streaming import KeyedStreamingAudioRecorder
-from config import WHISPER_HOST, GPT_HOST
+from config import WHISPER_HOST, GPT_HOST, GPT_PORT
 from parsing import SentenceParser
 import sys
 import time
@@ -20,7 +20,7 @@ def typewriter_effect(sequence, delay=None):
             time.sleep(delay)
    
 
-def typewriter_print(sentence, done_event=None, delay=0.1):
+def typewrite(sentence, done_event=None, delay=0.1):
     #TODO: use join() instead of events
     for word in sentence.split(' '):
         print(word, end=' ', flush=True)
@@ -33,24 +33,23 @@ def run():
                                                      server_ip=WHISPER_HOST)
     streaming_recorder.standby(one_shot=False)
     parser = SentenceParser()
-    done = Event()
-    done.set()
+    sentence_thread = None
     while True:
         prompt = streaming_recorder.q.get()
-        client = Client(GPT_HOST, 5000)
+
+        client = Client(GPT_HOST, GPT_PORT)
         client.send(prompt)
+
         token_seq = client.receive_stream()
-        for token in token_seq:
-            sentence = parser.feed(token.decode("utf-8"))
-            if sentence is not None:
-                done.wait()
-                done.clear()
-                Thread(target=typewriter_print, args=(sentence, done)).start()
-        sentence = parser.end()
-        done.wait()
-        done.clear()
-        Thread(target=typewriter_print, args=(sentence, done)).start()
-        done.wait()
-        print(f"\n(token count: {len(parser.tokens)})")
+        sentence_seq = parser.get_sentences(token_seq)
+
+        for sentence in sentence_seq:
+            if sentence_thread:
+                sentence_thread.join()
+            sentence_thread = Thread(target=typewrite, args=(sentence,))
+            sentence_thread.start()
+        sentence_thread.join()
+
+        print(f"\n\n(token count: {len(parser.tokens)})")
         parser.reset()
 
