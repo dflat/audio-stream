@@ -21,7 +21,8 @@ def typewriter_effect(sequence, delay=None):
    
 
 def typewriter_print(sentence, done_event=None, delay=0.1):
-    for word in sentence.split():
+    #TODO: use join() instead of events
+    for word in sentence.split(' '):
         print(word, end=' ', flush=True)
         time.sleep(delay)
     if done_event:
@@ -46,6 +47,7 @@ def run():
                 done.clear()
                 Thread(target=typewriter_print, args=(sentence, done)).start()
         sentence = parser.end()
+        done.wait()
         done.clear()
         Thread(target=typewriter_print, args=(sentence, done)).start()
         done.wait()
