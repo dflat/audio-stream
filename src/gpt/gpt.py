@@ -56,7 +56,7 @@ class GPT:
         next(self.gen)
 
 class GPTServer(MessageInSequenceOutServer):
-	def __init__(self, host='',
+    def __init__(self, host='',
                        port=GPT_PORT,
                        chunk_size=CHUNK_SIZE,):
 
@@ -64,9 +64,6 @@ class GPTServer(MessageInSequenceOutServer):
         self.gpt = GPT()
         
     def _process(self, message: bytes) -> Generator[bytes, None, None]:
-    	return (token.encode('utf-8') for token in 
+        return (token.encode('utf-8') for token in 
                 self.gpt.get_tokens(message.decode('utf-8')))
 
-if __name__ == '__main__':
-    gpt = GPTServer()
-    gpt.serve()
