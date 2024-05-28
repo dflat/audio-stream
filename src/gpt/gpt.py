@@ -1,10 +1,9 @@
-import time
-from config import GPT_PORT, GPT_DEVICE, CHUNK_SIZE
-from server import MessageInSequenceOutServer
-from gpt4all import GPT4All
-from model_config import SYSTEM_PROMPT
 from typing import Generator
-
+import time
+from gpt4all import GPT4All
+from .model_config import SYSTEM_PROMPT
+from ..config import GPT_PORT, GPT_DEVICE, CHUNK_SIZE
+from ..network import MessageInSequenceOutServer
 
 class GPT:
     settings = dict(temp = 0.7, 

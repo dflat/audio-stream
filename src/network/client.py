@@ -1,7 +1,7 @@
-import socket
-from config import HOST, PORT, CHUNK_SIZE
-from structures import Transmit
 from typing import Iterable
+import socket
+from ..config import HOST, PORT, CHUNK_SIZE
+from .structures import Transmit
 
 class Client:
     def __init__(self, host: str=HOST,

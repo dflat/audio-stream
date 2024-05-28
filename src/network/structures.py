@@ -1,7 +1,6 @@
+from typing import Union
 import struct
 import socket
-import math
-from typing import Union
 
 class Transmit:
     """

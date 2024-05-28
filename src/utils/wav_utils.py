@@ -1,5 +1,5 @@
 import wave
-from config import CHANNELS, AUDIO_SAMPLE_RATE
+from ..config import CHANNELS, AUDIO_SAMPLE_RATE
 
 def save_wav(buffer,
              wav_file_path,

@@ -8,12 +8,12 @@ Servers come in four varieties:
     The normal server class, Server, is MIMO. The other varieties are
     subclasses of Server, found below.
 """
+from typing import Generator
 import socket
 import threading
-import teardown
-from config import PORT, CHUNK_SIZE
-from structures import Transmit
-from typing import Generator
+from ..utils import teardown
+from ..config import PORT, CHUNK_SIZE
+from .structures import Transmit
 
 class Server:
     """

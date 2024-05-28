@@ -2,11 +2,11 @@ import pyaudio
 import wave
 import time
 import threading
-from config import PORT, AUDIO_SAMPLE_RATE, CHANNELS, AUDIO_CHUNK_SIZE, WHISPER_HOST
-from pydub import AudioSegment
-from key_input import KeyboardListener
-from client import Client
 import queue
+from pydub import AudioSegment
+from .config import PORT, AUDIO_SAMPLE_RATE, CHANNELS, AUDIO_CHUNK_SIZE, WHISPER_HOST
+from .utils import KeyboardListener
+from .network import Client
 
 class BaseAudioRecorder:
     """

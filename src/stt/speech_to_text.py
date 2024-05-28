@@ -1,10 +1,10 @@
-from server import SequenceInMessageOutServer
 print('importing numpy...', end=' ')
 import numpy as np
 print('loaded.')
-from config import PORT, CHUNK_SIZE, WHISPER_MODEL
 import queue
 import threading
+from ..config import PORT, CHUNK_SIZE, WHISPER_MODEL
+from ..network import SequenceInMessageOutServer
 
 class Whisper:
     def __init__(self, model_name=WHISPER_MODEL):

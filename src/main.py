@@ -1,10 +1,10 @@
-from client import Client
-from audio_streaming import KeyedStreamingAudioRecorder
-from config import WHISPER_HOST, GPT_HOST, GPT_PORT
-from parsing import SentenceParser
 import sys
 import time
 from threading import Thread, Event
+from .network import Client
+from .audio_streaming import KeyedStreamingAudioRecorder
+from .config import WHISPER_HOST, GPT_HOST, GPT_PORT
+from .utils import SentenceParser
 
 def typewrite(sentence, delay=0.1):
     for word in sentence.split(' '):

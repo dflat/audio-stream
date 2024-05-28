@@ -1,6 +1,6 @@
+from typing import Union, Iterable
 import re
 import queue
-from typing import Union, Iterable
 
 class SentenceParser:
     sentinel = None
