@@ -5,6 +5,7 @@ import queue
 import threading
 from ..config import PORT, CHUNK_SIZE, WHISPER_MODEL
 from ..network import SequenceInMessageOutServer
+from ..utils import save_wav
 
 class Whisper:
     def __init__(self, model_name=WHISPER_MODEL):
@@ -45,7 +46,6 @@ class SpeechToTextServer(SequenceInMessageOutServer):
         Message will be a completed bytes object (buffer),
         streamed by client (perhaps via live microphone recording).
         """
-        from wav_utils import save_wav
         print('saving wav file...', end=' ')
         save_wav(message, 'test_1ch_16000hz.wav')
         print('saved.')
