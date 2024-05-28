@@ -1,6 +1,6 @@
 import re
 import queue
-from typing import Union
+from typing import Union, Iterable
 
 class SentenceParser:
     sentinel = None
@@ -8,10 +8,12 @@ class SentenceParser:
     def __init__(self):
         self.tokens = []
         self.stack = []
-        self.q = queue.Queue()
+        self.n_tokens = 0
+        #self.q = queue.Queue()
 
     def _detect_sentence_end(self, text):
         # Define the regular expression pattern for sentence end detection
+        # TODO: sentence can begin with a quote
         sentence_end_pattern = re.compile(r"""
             (?<!\b[A-Z])              # Negative lookbehind (e.g., "E.", "Q.") 
             (?<!\b[A-Z][a-z]\.)       # Negative lookbehind  (e.g., "Mr.", "Dr.")
@@ -28,16 +30,25 @@ class SentenceParser:
         matches = [match.end() for match in sentence_end_pattern.finditer(text)]
         return matches
 
+    def get_sentences(self, token_seq: Iterable[bytes]) -> Iterable[str]:
+        for token in token_seq:
+            sentence = self.feed(token.decode("utf-8"))
+            if sentence is not None:
+                yield sentence
+        last_sentence = self.end()
+        self.n_tokens = len(self.tokens)
+        self.reset()
+        yield last_sentence
+
     def reset(self):
         self.tokens = []
         self.stack = []
 
-
     def end(self):
         last_sentence = ''.join(self.stack)
         self.tokens.extend(self.stack)
-        self.q.put(last_sentence)
-        self.q.put(SentenceParser.sentinel)
+        #self.q.put(last_sentence)
+        #self.q.put(SentenceParser.sentinel)
         return last_sentence
 
     def feed(self, token: str) -> Union[str, None]:
@@ -46,7 +57,7 @@ class SentenceParser:
         if self._detect_sentence_end(text):
             *sentence_tokens, next_start_token = self.stack
             text = ''.join(sentence_tokens)
-            self.q.put(text)
+            #self.q.put(text)
             self.tokens.extend(sentence_tokens)
             self.stack = [next_start_token]
             return text
