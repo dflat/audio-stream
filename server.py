@@ -12,7 +12,7 @@ import socket
 import threading
 import teardown
 from config import PORT, CHUNK_SIZE
-from structures import Record
+from structures import Transmit
 from typing import Generator
 
 class Server:
@@ -103,10 +103,10 @@ class Server:
         return message
 
     def _receive(self, client_socket):
-        return Record.read_from_socket(client_socket)
+        return Transmit.read_from_socket(client_socket)
 
     def _send(self, client_socket, response):
-        Record.send_over_socket(client_socket, response)
+        Transmit.send_over_socket(client_socket, response)
 
 class MessageInSequenceOutServer(Server):
     """
@@ -120,7 +120,7 @@ class MessageInSequenceOutServer(Server):
     def _send(self, client_socket, sequence: Generator[bytes, None, None]) -> None:
         for message in sequence:
             super()._send(client_socket, message)
-        Record.end_transmission(client_socket)
+        Transmit.end_transmission(client_socket)
 
 
 class SequenceInMessageOutServer(Server):

@@ -1,6 +1,6 @@
 import socket
 from config import HOST, PORT, CHUNK_SIZE
-from structures import Record
+from structures import Transmit
 from typing import Iterable
 
 class Client:
@@ -19,12 +19,12 @@ class Client:
 
     def send(self, data: bytes) -> None:
         try:
-            Record.send_over_socket(self.sock, data)
+            Transmit.send_over_socket(self.sock, data)
         except Exception as e:
             print(f"Client encountered error sending data: {e}")
 
     def receive(self) -> bytes:
-        return Record.read_from_socket(self.sock)
+        return Transmit.read_from_socket(self.sock)
 
     def receive_stream(self) -> Iterable[bytes]:
         while True:
@@ -34,7 +34,7 @@ class Client:
             yield data
 
     def end_transmission(self) -> None:
-        Record.end_transmission(self.sock)
+        Transmit.end_transmission(self.sock)
 
     def close(self) -> None:
         self.sock.close()

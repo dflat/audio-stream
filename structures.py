@@ -3,15 +3,15 @@ import socket
 import math
 from typing import Union
 
-class Record:
+class Transmit:
     """
     Static class, providing an interface for streaming chunks of variable
         size over the network. Uses an end_of_transmission signal.
 
     Main public API usage:
         Given a socket object, (sock), and some bytes (payload):
-            Record.send_over_socket(sock, payload) 
-            payload = Record.read_from_socket(sock)
+            Transmit.send_over_socket(sock, payload) 
+            payload = Transmit.read_from_socket(sock)
         When read_from_socket returns None, transmission is complete.
     """
     size_prefix_type = '!I'  # 32-bit unsigned integer, big-endian
@@ -27,7 +27,7 @@ class Record:
         try:
             #prefix_bytes = sock.recv(cls.n_prefix_bytes)
             #maybe this fixes common error here
-            prefix_bytes = Record._receive(sock, cls.n_prefix_bytes)
+            prefix_bytes = Transmit._receive(sock, cls.n_prefix_bytes)
 
 
             if len(prefix_bytes) < cls.n_prefix_bytes:
@@ -46,7 +46,7 @@ class Record:
         except Exception as e:
             print(f"Error: {e}")
             sock.close()
-            print('socket closed by exception in Record.read_from_socket')
+            print('socket closed by exception in Transmit.read_from_socket')
             raise
 
     @classmethod
