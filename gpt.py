@@ -1,5 +1,5 @@
 import time
-from config import GPT_PORT, CHUNK_SIZE
+from config import GPT_PORT, GPT_DEVICE, CHUNK_SIZE
 from server import MessageInSequenceOutServer
 from gpt4all import GPT4All
 from model_config import SYSTEM_PROMPT
@@ -21,6 +21,7 @@ class GPT:
                 context_size=4096):
         self.model_name = model_name
         self.context_size = context_size
+        self.device = GPT_DEVICE
         self.load_model()
         self.start_session()
 
@@ -28,7 +29,8 @@ class GPT:
     def load_model(self):
         print("loading model")
         self.model = GPT4All(model_name=self.model_name,
-                            n_ctx=self.context_size)
+                            n_ctx=self.context_size,
+                            device=self.device)
         print("finished loading model")
 
     def start_session(self):
