@@ -6,27 +6,10 @@ import sys
 import time
 from threading import Thread, Event
 
-def typewriter_effect(sequence, delay=None):
-    tokens = []
-    i = 0 
-    for t in sequence:
-        t = t.decode('utf-8')
-        if '\n' in t:
-            t = t.replace('\n',' -- ')
-        tokens.append(t)
-        text = ''.join(tokens)
-        sys.stdout.write('\r' + text)
-        if delay:
-            time.sleep(delay)
-   
-
-def typewrite(sentence, done_event=None, delay=0.1):
-    #TODO: use join() instead of events
+def typewrite(sentence, delay=0.1):
     for word in sentence.split(' '):
         print(word, end=' ', flush=True)
         time.sleep(delay)
-    if done_event:
-        done_event.set()
 
 def run():
     recorder = KeyedStreamingAudioRecorder(key='r', server_ip=WHISPER_HOST)
@@ -35,7 +18,7 @@ def run():
     sentence_thread = None
 
     while True:
-        prompt = streaming_recorder.q.get()
+        prompt = recorder.wait_for_input()
 
         client = Client(GPT_HOST, GPT_PORT)
         client.send(prompt)
