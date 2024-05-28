@@ -3,19 +3,17 @@ HOST = ''
 PORT = 5000
 CHUNK_SIZE = 8192
 
-# whisper
+# speech-to-text server
 WHISPER_HOST = '192.168.1.219'
+WHISPER_MODEL = 'base'
 
 # GPT token generation server
-OUTPUT_HOST = ''
-OUTPUT_PORT = 6000
-GPT_FINISH = 'x_end_x'
 GPT_HOST = '192.168.1.176'
+GPT_PORT = 9000
+GPT_DEVICE = "nvidia"
 
 # audio
 AUDIO_SAMPLE_RATE = 16000 # Sample rate that Whisper requires
 CHANNELS = 1
 AUDIO_CHUNK_SIZE = 4096
 
-# speech-to-text
-WHISPER_MODEL = 'base'
