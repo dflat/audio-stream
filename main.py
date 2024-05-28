@@ -33,6 +33,6 @@ def run():
             sentence_thread.start()
         sentence_thread.join()
 
-        print(f"\n\n(token count: {len(parser.tokens)})")
+        print(f"\n\n(token count: {parser.n_tokens})")
         parser.reset()
 
