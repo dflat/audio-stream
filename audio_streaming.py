@@ -183,6 +183,9 @@ class StreamingAudioRecorder(BaseAudioRecorder):
         self.waiting_for_response = False
         self.q = queue.Queue()
 
+    def wait_for_input(self):
+        return self.q.get()
+
     def open_socket(self):
         """
         Creates a TCP Socket to stream audio data over a network,

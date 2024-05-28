@@ -29,11 +29,11 @@ def typewrite(sentence, done_event=None, delay=0.1):
         done_event.set()
 
 def run():
-    streaming_recorder = KeyedStreamingAudioRecorder(key='r',
-                                                     server_ip=WHISPER_HOST)
-    streaming_recorder.standby(one_shot=False)
+    recorder = KeyedStreamingAudioRecorder(key='r', server_ip=WHISPER_HOST)
+    recorder.standby(one_shot=False)
     parser = SentenceParser()
     sentence_thread = None
+
     while True:
         prompt = streaming_recorder.q.get()
 
