@@ -1,5 +1,5 @@
 import time
-from config import PORT, CHUNK_SIZE
+from config import GPT_PORT, CHUNK_SIZE
 from server import MessageInSequenceOutServer
 from gpt4all import GPT4All
 from model_config import SYSTEM_PROMPT
@@ -56,10 +56,10 @@ class GPT:
 
 class GPTServer(MessageInSequenceOutServer):
 	def __init__(self, host='',
-                       port=PORT,
+                       port=GPT_PORT,
                        chunk_size=CHUNK_SIZE,):
 
-        super().__init__(host='', port=PORT, chunk_size=CHUNK_SIZE)
+        super().__init__(host='', port=GPT_PORT, chunk_size=CHUNK_SIZE)
         self.gpt = GPT()
         
     def _process(self, message: bytes) -> Generator[bytes, None, None]:
