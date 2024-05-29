@@ -5,7 +5,7 @@ import queue
 import threading
 from ..config import PORT, CHUNK_SIZE, WHISPER_MODEL
 from ..network import SequenceInMessageOutServer
-from ..utils import save_wav
+from ..utils import save_wav, buffer_to_array, normalize
 
 class Whisper:
     def __init__(self, model_name=WHISPER_MODEL):
@@ -72,11 +72,6 @@ class QueuedSpeechToTextServer(SpeechToTextServer):
         """
         self.q.put(response)
 
-def buffer_to_array(buffer, dtype=np.int16):
-    return np.frombuffer(buffer, dtype=dtype) 
-
-def normalize(arr):
-    return arr.astype(np.float32) / np.iinfo(np.int16).max
 
 def continuous_transcribe():
     while server.running:

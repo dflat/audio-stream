@@ -4,3 +4,4 @@ except ImportError as e:
     print('Skipping KeyboardListener import: no supported on linux.')
 from .parsing import SentenceParser
 from .wav_utils import save_wav
+from .array_utils import buffer_to_array, normalize

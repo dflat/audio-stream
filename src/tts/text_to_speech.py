@@ -19,7 +19,7 @@ class UnrealSpeech:
         return locals()
 
     @staticmethod
-    def get_audio(text: str, **kwargs) -> np.ndarray[np.int16]:
+    def get_audio(text: str, **kwargs) -> np.ndarray:
         payload = UnrealSpeech._make_payload(text, **kwargs)
         t = time.time()
         resp = requests.post(UnrealSpeech.url, json=payload, headers=UnrealSpeech.headers, stream=True)
