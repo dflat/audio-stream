@@ -5,11 +5,17 @@ from .network import Client
 from .audio_streaming import KeyedStreamingAudioRecorder
 from .config import WHISPER_HOST, GPT_HOST, GPT_PORT
 from .utils import SentenceParser
+from .tts import fetch_and_play
 
 def typewrite(sentence, delay=0.1):
     for word in sentence.split(' '):
         print(word, end=' ', flush=True)
         time.sleep(delay)
+
+def play_and_type_text(sentence, type_transcript=True):
+    if type_transcript:
+        Thread(target=typewrite, args=(sentence,)).start()
+    fetch_and_play(sentence)
 
 def run():
     recorder = KeyedStreamingAudioRecorder(key='r', server_ip=WHISPER_HOST)
@@ -29,7 +35,7 @@ def run():
         for sentence in sentence_seq:
             if sentence_thread:
                 sentence_thread.join()
-            sentence_thread = Thread(target=typewrite, args=(sentence,))
+            sentence_thread = Thread(target=play_and_type_text, args=(sentence,))
             sentence_thread.start()
         sentence_thread.join()
 

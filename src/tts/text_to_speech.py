@@ -10,23 +10,25 @@ class UnrealSpeech:
 
     @staticmethod
     def _make_payload(Text,
-                      VoiceId="Scarlett",
+                      VoiceId="Will",
                       Bitrate="192k",
                       Speed=0,
-                      Pitch=1.0,
+                      Pitch=0.92,
                       Codec="pcm_s16le",
                       Temperature=0.25):
         return locals()
 
+
     @staticmethod
-    def get_audio(text: str, **kwargs) -> np.ndarray:
+    def get_stream(text:str, **kwargs) -> 'Response':
         payload = UnrealSpeech._make_payload(text, **kwargs)
-        t = time.time()
-        resp = requests.post(UnrealSpeech.url, json=payload, headers=UnrealSpeech.headers, stream=True)
+        print('request sent')
+        start = time.time()
+        resp = requests.post(url=UnrealSpeech.url,
+                             json=payload,
+                             headers=UnrealSpeech.headers,
+                             stream=True)
         resp.raise_for_status()
-        e = time.time()
-        UnrealSpeech.dur = e-t
-        return b''.join(resp.iter_content(4096))
-        
-        #return np.frombuffer(resp.content, np.int16)
-        
+        end = time.time()
+        print(f'response received after {end-start:.1f} seconds.')
+        return resp
