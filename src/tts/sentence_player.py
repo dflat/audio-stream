@@ -1,4 +1,5 @@
 from threading import Thread
+import time
 from .audio_playback import fetch_and_play
 
 def typewrite(sentence, delay=0.1):
