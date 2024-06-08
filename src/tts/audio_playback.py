@@ -7,9 +7,12 @@ import time
 from collections import deque
 import threading
 import queue
+import logging
 
 from .text_to_speech import UnrealSpeech
 from ..utils import buffer_to_array, save_wav
+
+logger = logging.getLogger(__name__)
 
 print('imports done')
 WINDOW_SIZE = 2048
@@ -88,7 +91,7 @@ class StreamingAudioBuffer:
             return b''
 
     def preload(self):
-        print('preload of window buffer starting...')
+        logger.debug('preload of window buffer starting...')
         # strip off wav header bytes from raw network byte stream
         first_chunk = self.get_chunk()
         data = first_chunk[self.wav_header_bytes:]
@@ -96,7 +99,7 @@ class StreamingAudioBuffer:
         # read chunks to build a network-latency-buffer
         for _ in range(self.n_preload_frames):
             self.push_to_buffer(self.get_chunk())
-        print(f'preloaded {self.n_preload_frames} frame windows')
+        logger.debug(f'preloaded {self.n_preload_frames} frame windows')
 
     def window_generator(self) -> Iterable[np.ndarray]:
         # stream bytes, but redirected through a window_queue
@@ -153,12 +156,12 @@ class StreamedAudioPlayer:
         self.window_size = WINDOW_SIZE # bytes per window
 
     def play(self):
-        print('opening paudio stream...')
+        logger.debug('opening paudio stream...')
         stream = self.paudio.open(format=pyaudio.paInt16,
                         channels=1,
                         rate=22050,
                         output=True)
-        print('paudio stream opened')
+        logger.debug('paudio stream opened')
 
         n = self.window_size
         buf = self.audio_buffer

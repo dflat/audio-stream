@@ -2,6 +2,9 @@ from .. import config
 import requests
 import numpy as np
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 class UnrealSpeech:
     api_key = config.API_KEY
@@ -22,7 +25,7 @@ class UnrealSpeech:
     @staticmethod
     def get_stream(text:str, **kwargs) -> 'Response':
         payload = UnrealSpeech._make_payload(text, **kwargs)
-        print('request sent')
+        logger.info("request sent to UnrealSpeech")
         start = time.time()
         resp = requests.post(url=UnrealSpeech.url,
                              json=payload,
@@ -30,5 +33,5 @@ class UnrealSpeech:
                              stream=True)
         resp.raise_for_status()
         end = time.time()
-        print(f'response received after {end-start:.1f} seconds.')
+        logger.info(f'response received after {end-start:.1f} seconds.')
         return resp
