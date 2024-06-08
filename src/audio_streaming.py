@@ -33,7 +33,7 @@ class BaseAudioRecorder:
         """
         if not self.recording:
             self._init()
-            threading.Thread(target=self._record).start()
+            threading.Thread(target=self._record, name='[recorder]').start()
             print('Recording started...')
         else:
             print('Recording already in progress.')
