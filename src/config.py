@@ -18,5 +18,4 @@ CHANNELS = 1
 AUDIO_CHUNK_SIZE = 4096
 
 #unrealspeech api
-API_KEY = "SiuuJ65SGdHINszhUETYPVv8Q1HwTwkgRH8NTGQFm9u7Ghd0W7Gpjl"
 UNREALSPEECH_URL = "https://api.v6.unrealspeech.com/stream"

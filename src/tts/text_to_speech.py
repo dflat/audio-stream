@@ -1,4 +1,5 @@
 from .. import config
+from .. import creds
 import requests
 import numpy as np
 import time
@@ -7,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class UnrealSpeech:
-    api_key = config.API_KEY
+    api_key = creds.UNREAL_API_KEY
     url = config.UNREALSPEECH_URL
     headers = {"accept": "text/plain", "content-type": "application/json", "Authorization": "Bearer " + api_key}
 
