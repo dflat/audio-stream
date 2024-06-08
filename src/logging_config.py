@@ -23,7 +23,7 @@ def setup_logging(log_level=logging.INFO):
             'level': log_level,
         },
         'loggers': {
-            '__main__': {  # Change this to the actual main module of your package
+            '__main__': {
                 'handlers': ['console'],
                 'level': log_level,
                 'propagate': False
