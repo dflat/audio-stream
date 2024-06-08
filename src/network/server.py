@@ -9,6 +9,7 @@ Servers come in four varieties:
     subclasses of Server, found below.
 """
 from typing import Generator
+import random
 import socket
 import threading
 from ..utils import teardown
@@ -30,6 +31,7 @@ class Server:
         teardown.register(self.teardown)
         self.host = host
         self.port = port
+        self.name = self.__class__.__name__
         self.chunk_size = chunk_size
         self.keep_alive = False # maybe make True
         self._running = threading.Event()
@@ -50,7 +52,7 @@ class Server:
     def serve(self):
         print(f"\nServer is listening on {self.host}:{self.port}")
         self._running.set()
-        threading.Thread(target=self._serve).start()
+        threading.Thread(target=self._serve, name=self.name).start()
 
     def teardown(self):
         if self.running:
@@ -72,7 +74,10 @@ class Server:
         while self.running:
             client_socket, client_address = self.server_socket.accept()
             print(f"Connection established with {client_address}")
-            client_thread = threading.Thread(target=self._handle_client, args=(client_socket,))
+            name = f'{self.name} [{client_address}] <{random.getrandbits(20)}>'
+            client_thread = threading.Thread(target=self._handle_client,
+                                             args=(client_socket,),
+                                             name=name)
             client_thread.start()
         print('Server has been shut down.')
 
